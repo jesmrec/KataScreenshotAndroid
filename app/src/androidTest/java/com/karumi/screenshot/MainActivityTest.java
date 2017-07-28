@@ -19,6 +19,8 @@ package com.karumi.screenshot;
 import android.app.Activity;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.rule.IntentsTestRule;
+import android.view.View;
+
 import com.karumi.screenshot.di.MainComponent;
 import com.karumi.screenshot.di.MainModule;
 import com.karumi.screenshot.model.SuperHero;
@@ -31,6 +33,9 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.contrib.RecyclerViewActions.scrollToPosition;
+import static android.support.test.espresso.Espresso.onView;
 
 import static org.mockito.Mockito.when;
 
@@ -61,6 +66,36 @@ public class MainActivityTest extends ScreenshotTest {
     compareScreenshot(activity);
   }
 
+  @Test public void showJustOneSuperHero(){
+    givenThereAreSomeSuperHeroes(1, true);
+
+    Activity activity = startActivity();
+
+    compareScreenshot(activity);
+  }
+
+  @Test public void showTenSuperHeros(){
+    givenThereAreSomeSuperHeroes(10, false);
+
+    Activity activity = startActivity();
+
+    compareScreenshot(activity);
+  }
+
+  @Test public void shownTheFifthElement(){
+
+      givenThereAreSomeSuperHeroes(10, false);
+
+      Activity activity = startActivity();
+
+
+      onView(withId(R.id.recycler_view))
+              .perform(scrollToPosition(5));
+
+      compareScreenshot(activity);
+    }
+
+
   private List<SuperHero> givenThereAreSomeSuperHeroes(int numberOfSuperHeroes, boolean avengers) {
     List<SuperHero> superHeroes = new LinkedList<>();
     for (int i = 0; i < numberOfSuperHeroes; i++) {
@@ -77,6 +112,10 @@ public class MainActivityTest extends ScreenshotTest {
   private void givenThereAreNoSuperHeroes() {
     when(repository.getAll()).thenReturn(Collections.<SuperHero>emptyList());
   }
+
+  /*private void givenOneSuperHero() {
+    when(repository.getAll()).thenReturn(new SuperHero("1","1",true,"1"));
+  }*/
 
   private MainActivity startActivity() {
     return activityRule.launchActivity(null);
